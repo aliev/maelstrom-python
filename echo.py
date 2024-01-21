@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 
-from typing import IO, Any, TypedDict
+from typing import IO
 import json
 import sys
-
-
-class Message(TypedDict):
-    src: str
-    dest: str
-    body: dict[str, Any]
+from protocol import Message
 
 
 class EchoServer:
