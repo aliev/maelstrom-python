@@ -2,20 +2,12 @@
 
 import json
 import sys
-from typing import IO, Any, Callable
+from typing import IO, Callable
 from multiprocessing import Lock, RLock
-from protocol import Message
+from protocol import Body, Message
 
 
 Handler = Callable[["Node", Message], None]
-
-
-def initial_handler(node: "Node", msg: Message) -> None:
-    node.node_id = msg["body"]["node_id"]
-    node.node_ids = msg["body"]["node_ids"]
-
-    node.reply(msg, {"type": "init_ok"})
-    node.log(f"Node {node.node_id} initialized")
 
 
 
@@ -37,8 +29,6 @@ class Node:
 
         self.lock = RLock()
         self.log_lock = Lock()
-
-        self.on("init", initial_handler)
 
     def log(self, message: str):
         with self.log_lock:
@@ -62,17 +52,22 @@ class Node:
     def parse_msg(self, line) -> Message:
         return json.loads(line)
 
+    def reply(self, msg: Message, body: Body):
+        body = msg["body"]
 
-    def reply(self, req: Message, body: dict[str, Any]):
-        body = {**body, "in_reply_to": req["body"]["msg_id"]}
+        if "msg_in" not in body:
+            raise ValueError(f"Key msg_in expected in body.")
 
-        self.send(req["src"], body)
+        self.send(msg["src"], {**body, "in_reply_to": body["msg_id"]})
 
-    def on(self, typ: str, handler: Handler):
-        if handler in self.handlers:
-            raise ValueError(f"Already have a handler for {typ}")
+    def on(self, typ: str):
+        def inner(func):
+            if typ in self.handlers:
+                raise ValueError(f"Already have a handler for {typ}")
 
-        self.handlers[typ] = handler
+            self.handlers[typ] = func
+
+        return inner
 
     def main(self):
         for line in sys.stdin:
@@ -97,30 +92,49 @@ class Broadcast:
     ):
         self.node = Node()
         self.neighbors = []
-        self.messages = set()
+        self.messages = []
         self.lock = Lock()
 
+        @self.node.on("init")
+        def initial_handler(node: "Node", msg: Message) -> None:
+            body = msg["body"]
+
+            if "node_id" not in body or "node_ids" not in body:
+                raise
+
+            node.node_id = body["node_id"]
+            node.node_ids = body["node_ids"]
+
+            node.reply(msg, {"type": "init_ok"})
+            node.log(f"Node {node.node_id} initialized")
+
+        @self.node.on("topology")
         def topology_handler(node: "Node", msg: Message) -> None:
-            self.neighbors = msg["body"]["topology"][node.node_id]
+            body = msg["body"]
+
+            if "topology" not in body:
+                raise ValueError("Expected topology key for topology handler in body.")
+
+            self.neighbors = body["topology"][node.node_id]
             node.log(f"My neighbors are {self.neighbors}")
             node.reply(msg, {"type": "topology_ok"})
 
+        @self.node.on("read")
         def read_handler(node: "Node", msg: Message) -> None:
             with self.lock:
                 node.reply(msg, {"type": "read_ok", "messages": self.messages})
 
+        @self.node.on("broadcast")
         def broadcast_handler(node: "Node", msg: Message) -> None:
-            m = msg["body"]["message"]
+            body = msg["body"]
+
+            if "message" not in body:
+                raise ValueError(f"Expected message to be not in body.")
 
             with self.lock:
-                self.messages.add(m)
+                self.messages.append(body["message"])
 
             node.reply(msg, {"type": "broadcast_ok"})
-
-
-        self.node.on("topology", topology_handler)
-        self.node.on("read", read_handler)
-        self.node.on("broadcast", broadcast_handler)
 
 
 if __name__ == "__main__":

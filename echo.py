@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from typing import IO
+from typing import IO, TYPE_CHECKING
 import json
 import sys
-from protocol import Message
+from protocol import Message, Body
 
 
 class EchoServer:
@@ -12,7 +12,7 @@ class EchoServer:
         request: IO[str],
         response: IO[str],
         response_error: IO[str],
-        node_id: int | None = None,
+        node_id: str | None = None,
     ):
         self.node_id = node_id
         self.next_msg_id = 0
@@ -23,22 +23,25 @@ class EchoServer:
 
     def reply(
         self,
-        request: Message,
-        body: dict,
+        request_message: Message,
+        body: Body,
     ):
         self.next_msg_id += 1
 
-        response = {
+        if TYPE_CHECKING:
+            assert self.node_id is not None
+
+        response_message: Message = {
             "src": self.node_id,
-            "dest": request["src"],
+            "dest": request_message["src"],
             "body": {
                 "msg_id": self.next_msg_id,
-                "in_reply_to": request["body"]["msg_id"],
+                "in_reply_to": request_message["body"]["msg_id"],
                 **body,
             }
         }
 
-        json.dump(response, self.response)
+        json.dump(response_message, self.response)
 
         self.response.write("\n")
         self.response.flush()
