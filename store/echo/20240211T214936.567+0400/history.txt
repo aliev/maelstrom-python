@@ -1,0 +1,432 @@
+3	:invoke	:echo	"Please echo 64"
+3	:info	:echo	"Please echo 64"	indeterminate: Malformed RPC response. Maelstrom sent node n4 the following request:
+
+{:echo "Please echo 64", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 2}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+8	:invoke	:echo	"Please echo 100"
+8	:info	:echo	"Please echo 100"	indeterminate: Malformed RPC response. Maelstrom sent node n4 the following request:
+
+{:echo "Please echo 100", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 3}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+4	:invoke	:echo	"Please echo 115"
+4	:info	:echo	"Please echo 115"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 115", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 2}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+2	:invoke	:echo	"Please echo 69"
+2	:info	:echo	"Please echo 69"	indeterminate: Malformed RPC response. Maelstrom sent node n3 the following request:
+
+{:echo "Please echo 69", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 2}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+9	:invoke	:echo	"Please echo 3"
+9	:info	:echo	"Please echo 3"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 3", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 3}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+13	:invoke	:echo	"Please echo 64"
+13	:info	:echo	"Please echo 64"	indeterminate: Malformed RPC response. Maelstrom sent node n4 the following request:
+
+{:echo "Please echo 64", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 4}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+18	:invoke	:echo	"Please echo 32"
+18	:info	:echo	"Please echo 32"	indeterminate: Malformed RPC response. Maelstrom sent node n4 the following request:
+
+{:echo "Please echo 32", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 5}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+14	:invoke	:echo	"Please echo 101"
+14	:info	:echo	"Please echo 101"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 101", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 4}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+7	:invoke	:echo	"Please echo 47"
+7	:info	:echo	"Please echo 47"	indeterminate: Malformed RPC response. Maelstrom sent node n3 the following request:
+
+{:echo "Please echo 47", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 3}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+19	:invoke	:echo	"Please echo 26"
+19	:info	:echo	"Please echo 26"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 26", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 5}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+12	:invoke	:echo	"Please echo 93"
+12	:info	:echo	"Please echo 93"	indeterminate: Malformed RPC response. Maelstrom sent node n3 the following request:
+
+{:echo "Please echo 93", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 4}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+24	:invoke	:echo	"Please echo 126"
+24	:info	:echo	"Please echo 126"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 126", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 6}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+17	:invoke	:echo	"Please echo 63"
+17	:info	:echo	"Please echo 63"	indeterminate: Malformed RPC response. Maelstrom sent node n3 the following request:
+
+{:echo "Please echo 63", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 5}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+0	:invoke	:echo	"Please echo 79"
+0	:info	:echo	"Please echo 79"	indeterminate: Malformed RPC response. Maelstrom sent node n1 the following request:
+
+{:echo "Please echo 79", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 2}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+22	:invoke	:echo	"Please echo 88"
+22	:info	:echo	"Please echo 88"	indeterminate: Malformed RPC response. Maelstrom sent node n3 the following request:
+
+{:echo "Please echo 88", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 6}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+29	:invoke	:echo	"Please echo 75"
+29	:info	:echo	"Please echo 75"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 75", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 7}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+5	:invoke	:echo	"Please echo 42"
+5	:info	:echo	"Please echo 42"	indeterminate: Malformed RPC response. Maelstrom sent node n1 the following request:
+
+{:echo "Please echo 42", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 3}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+34	:invoke	:echo	"Please echo 61"
+34	:info	:echo	"Please echo 61"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 61", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 8}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+39	:invoke	:echo	"Please echo 5"
+39	:info	:echo	"Please echo 5"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 5", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 9}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+10	:invoke	:echo	"Please echo 78"
+10	:info	:echo	"Please echo 78"	indeterminate: Malformed RPC response. Maelstrom sent node n1 the following request:
+
+{:echo "Please echo 78", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 4}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+1	:invoke	:echo	"Please echo 108"
+1	:info	:echo	"Please echo 108"	indeterminate: Malformed RPC response. Maelstrom sent node n2 the following request:
+
+{:echo "Please echo 108", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 2}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+6	:invoke	:echo	"Please echo 20"
+6	:info	:echo	"Please echo 20"	indeterminate: Malformed RPC response. Maelstrom sent node n2 the following request:
+
+{:echo "Please echo 20", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 3}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+23	:invoke	:echo	"Please echo 51"
+23	:info	:echo	"Please echo 51"	indeterminate: Malformed RPC response. Maelstrom sent node n4 the following request:
+
+{:echo "Please echo 51", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 6}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.
+44	:invoke	:echo	"Please echo 121"
+44	:info	:echo	"Please echo 121"	indeterminate: Malformed RPC response. Maelstrom sent node n5 the following request:
+
+{:echo "Please echo 121", :type "echo", :msg_id 1}
+
+And expected a response of the form:
+
+{:type (eq "echo_ok"), :echo Any, {:k :msg_id} Int, :in_reply_to Int}
+
+... but instead received
+
+{:type "echo_ok", :in_reply_to 1, :msg_id 10}
+
+This is malformed because:
+
+{:echo missing-required-key}
+
+See doc/protocol.md for more guidance.

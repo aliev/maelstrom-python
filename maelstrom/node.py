@@ -12,6 +12,10 @@ class Node:
         self.node_ids: set[str] = set()
         self.handlers: dict[str, Handler] = {}
         self.node_id: str = ""
+        self.next_msg_id = 0
+
+        self._lock = asyncio.Lock()
+        self._log_lock = asyncio.Lock()
 
     def set_io(
         self,
@@ -38,12 +42,23 @@ class Node:
     async def set_node_ids(self, node_ids: set[str]):
         self.node_ids.update(node_ids)
 
-    async def reply(self, src: str, body: Body):
-        await self.send(src, body)
+    async def reply(self, req: Message, body: Body):
+        self.next_msg_id += 1
+
+        msg_id = req.get("body", {}).get("msg_id", None)
+
+        if msg_id is None:
+            await self.log("Cannot parse req. msg_is is not presented.")
+            return
+
+        body = {**body, "in_reply_to": msg_id, "msg_id": self.next_msg_id}
+
+        await self.send(req["src"], body)
 
     async def log(self, msg: str) -> None:
-        self.logger.write((msg + "\n").encode())
-        await self.writer.drain()
+        async with self._log_lock:
+            self.logger.write((msg + "\n").encode())
+            await self.writer.drain()
 
     async def send(self, dest: str, body: Body):
         message: Message = {
@@ -58,7 +73,7 @@ class Node:
             logging.exception("Cannot decode object")
             return None
 
-        self.writer.write(result.encode())
-        await self.writer.drain()
-
-        await self.log(f"Respond with message {result}")
+        async with self._lock:
+            self.writer.write((result + "\n").encode())
+            await self.writer.drain()
+            await self.log(f"Respond with message {result}")

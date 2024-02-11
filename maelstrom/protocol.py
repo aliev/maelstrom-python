@@ -26,9 +26,13 @@ class Body(TypedDict):
     Lists all nodes in the cluster, including the recipient
     """
 
-    message: NotRequired[str]
+    message: NotRequired[int]
 
     messages: NotRequired[list]
+
+    topology: NotRequired[dict[str, list[str]]]
+
+    echo: NotRequired[str]
 
 
 class Message(TypedDict):
