@@ -1,4 +1,4 @@
-from typing import Any, NotRequired, TypedDict
+from typing import NotRequired, TypedDict
 
 
 class Body(TypedDict):

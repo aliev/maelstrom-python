@@ -3,7 +3,7 @@
 from typing import IO, TYPE_CHECKING
 import json
 import sys
-from protocol import Message, Body
+from maelstrom.protocol import Message, Body
 
 
 class EchoServer:

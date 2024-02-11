@@ -4,7 +4,7 @@ import json
 import sys
 from typing import IO, Callable
 from multiprocessing import Lock, RLock
-from protocol import Body, Message
+from maelstrom.protocol import Body, Message
 
 
 Handler = Callable[["Node", Message], None]
