@@ -27,28 +27,36 @@ class Node:
         self.writer = writer
         self.logger = logger
 
-    def on(self, msg_type: str):
+    def on(self):
+        """Registers new handler for node."""
         def inner(handler: Handler):
-            if msg_type in self.handlers:
-                logging.error("Already registered handler for %s", msg_type)
+            handler_name = handler.__name__
+            if handler_name in self.handlers:
+                logging.error("Already registered handler for %s", handler_name)
 
-            self.handlers[msg_type] = handler
+            self.handlers[handler_name] = handler
 
         return inner
 
     async def set_node_id(self, node_id: str):
         self.node_id = node_id
 
-    async def set_node_ids(self, node_ids: set[str]):
+    async def set_node_ids(self, node_ids: list[str]):
         self.node_ids.update(node_ids)
 
     async def reply(self, req: Message, body: Body):
+        """Reply with body to incoming message
+
+        Args:
+            req (Message): incoming message
+            body (Body): body.
+        """
         self.next_msg_id += 1
 
         msg_id = req.get("body", {}).get("msg_id", None)
 
         if msg_id is None:
-            await self.log("Cannot parse req. msg_is is not presented.")
+            await self.log("Cannot parse 'req': 'msg_is' is not presented.")
             return
 
         body = {**body, "in_reply_to": msg_id, "msg_id": self.next_msg_id}
@@ -56,6 +64,11 @@ class Node:
         await self.send(req["src"], body)
 
     async def log(self, msg: str) -> None:
+        """Thread safe and async version of log.
+
+        Args:
+            msg (str): log message.
+        """
         async with self._log_lock:
             self.logger.write((msg + "\n").encode())
             await self.writer.drain()

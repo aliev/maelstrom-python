@@ -17,7 +17,7 @@ logging.basicConfig(
 node = Node()
 b = Broadcast(node=node)
 
-@node.on("init")
+@node.on()
 async def init(node: Node, msg: Message):
     body = msg.get("body", {})
     node_id = body.get("node_id")
@@ -26,47 +26,60 @@ async def init(node: Node, msg: Message):
     if node_id is None or node_ids is None:
         return
 
-    node.node_id = node_id
-    node.node_ids.update(node_ids)
+    await node.set_node_id(node_id)
+    await node.set_node_ids(node_ids)
+
+    await node.log(f"Initialized node '{node.node_id}'")
 
     await node.reply(msg, {"type": "init_ok"})
     await node.log(f"Node {node.node_id} initialized.")
 
 
-@node.on("echo")
+@node.on()
 async def echo(node: Node, msg: Message):
     body = msg.get("body", {})
     await node.log(f"Echoing '{body.get("node_id")}'")
     await node.reply(msg, {"type": "echo_ok", "echo": body.get("echo", "")})
 
-@node.on("topology")
+@node.on()
 async def topology(node: Node, msg: Message):
+    """A topology message informs the node of an (optional) network topology: a map of nodes to neighbors."""
     body = msg.get("body", {})
-    neighbors = body.get("topology", {}).get(node.node_id, [])
-    b.neighbors = neighbors
+    topology = body.get("topology", {})
+    neighbors = topology.get(node.node_id, [])
+    await b.set_neighbors(neighbors)
     await node.reply(msg, {"type": "topology_ok"})
 
 
-@node.on("read")
+@node.on()
 async def read(node: Node, msg: Message):
     await node.reply(msg, {"type": "read_ok", "messages": list(b.messages)})
 
 
-@node.on("broadcast")
+@node.on()
 async def broadcast(node: Node, msg: Message):
+    """A broadcast request sends a message into the network."""
     body = msg.get("body", {})
     message = body.get("message")
+    msg_id = body.get("msg_id")
 
-    if message is None:
-        return
+    # We should avoid broadcasting a message if we already have it
+    if message is not None and message not in b.messages:
 
-    b.messages.add(message)
+        # Whenever we receive a broadcast message, we'll add that message's message to the set.
+        await b.add_message(message)
 
-    # Gossip this message to neighbors
-    for neighbor in b.neighbors:
-        await node.send(neighbor, {"type": "broadcast", "message": message})
+        # Gossip this message to neighbors
+        for neighbor in b.neighbors:
+            # Do not broadcast a message back to the server which sent it to us.
+            if msg["src"] == neighbor:
+                continue
+            await node.send(neighbor, {"type": "broadcast", "message": message})
 
-    await node.reply(msg, {"type": "broadcast_ok"})
+
+    # Inter-server messages don't have a msg_id, and don't need a response
+    if msg_id is not None:
+        await node.reply(msg, {"type": "broadcast_ok"})
 
 
 async def main():
