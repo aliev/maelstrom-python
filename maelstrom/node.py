@@ -1,10 +1,11 @@
 import asyncio
-import logging
 import json
-from typing import Any, Callable, Coroutine
+import logging
+from typing import Any, Callable, Coroutine, TypeAlias
+
 from maelstrom.protocol import Body, Message
 
-type Handler = Callable[[Node, Message], Coroutine[Any, Any, Any]]
+Handler: TypeAlias = Callable[["Node", Message], Coroutine[Any, Any, Any]]
 
 
 class Node:
@@ -21,7 +22,7 @@ class Node:
         self,
         reader: asyncio.StreamReader,
         writer: asyncio.StreamWriter,
-        logger: asyncio.StreamWriter
+        logger: asyncio.StreamWriter,
     ):
         self.reader = reader
         self.writer = writer
@@ -29,6 +30,7 @@ class Node:
 
     def on(self):
         """Registers new handler for node."""
+
         def inner(handler: Handler):
             handler_name = handler.__name__
             if handler_name in self.handlers:
@@ -37,12 +39,6 @@ class Node:
             self.handlers[handler_name] = handler
 
         return inner
-
-    async def set_node_id(self, node_id: str):
-        self.node_id = node_id
-
-    async def set_node_ids(self, node_ids: list[str]):
-        self.node_ids.update(node_ids)
 
     async def reply(self, req: Message, body: Body):
         """Reply with body to incoming message
@@ -69,9 +65,9 @@ class Node:
         Args:
             msg (str): log message.
         """
-        async with self._log_lock:
-            self.logger.write((msg + "\n").encode())
-            await self.writer.drain()
+        # async with self._log_lock:
+        self.logger.write(("LOG: " + msg + "\n").encode())
+        await self.logger.drain()
 
     async def send(self, dest: str, body: Body):
         message: Message = {
@@ -86,7 +82,7 @@ class Node:
             logging.exception("Cannot decode object")
             return None
 
-        async with self._lock:
-            self.writer.write((result + "\n").encode())
-            await self.writer.drain()
-            await self.log(f"Respond with message {result}")
+        # async with self._lock:
+        self.writer.write((result + "\n").encode())
+        await self.writer.drain()
+        await self.log(f"Respond with message {result}")

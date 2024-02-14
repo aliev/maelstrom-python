@@ -25,10 +25,12 @@ async def open_io_stream(
         # NOTE: https://stackoverflow.com/questions/52089869/how-to-create-asyncio-stream-reader-writer-for-stdin-stdout
         writer_transport, writer_protocol = await loop.connect_write_pipe(
             lambda: asyncio.streams.FlowControlMixin(loop=loop),
-            os.fdopen(writer.fileno(), "wb"))
+            os.fdopen(writer.fileno(), "wb"),
+        )
 
-        _writer = asyncio.streams.StreamWriter(writer_transport, writer_protocol, None, loop)
+        _writer = asyncio.streams.StreamWriter(
+            writer_transport, writer_protocol, None, loop
+        )
         writers_lst.append(_writer)
-
 
     return readers_lst, writers_lst
