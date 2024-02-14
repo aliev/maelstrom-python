@@ -28,11 +28,12 @@ class Node:
         self.writer = writer
         self.logger = logger
 
-    def on(self):
+    def on(self, name: str | None = None):
         """Registers new handler for node."""
 
         def inner(handler: Handler):
-            handler_name = handler.__name__
+            handler_name = handler.__name__ if name is None else name
+
             if handler_name in self.handlers:
                 logging.error("Already registered handler for %s", handler_name)
 
