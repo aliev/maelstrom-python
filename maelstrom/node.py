@@ -1,11 +1,15 @@
 import asyncio
+import datetime
 import json
 import logging
+import time
 from typing import Any, Callable, Coroutine, TypeAlias
 
 from maelstrom.protocol import Body, Message
 
 Handler: TypeAlias = Callable[["Node", Message], Coroutine[Any, Any, Any]]
+
+logger = logging.getLogger(__name__)
 
 
 class Node:
@@ -35,7 +39,7 @@ class Node:
             handler_name = handler.__name__ if name is None else name
 
             if handler_name in self.handlers:
-                logging.error("Already registered handler for %s", handler_name)
+                logger.error("Already registered handler for %s", handler_name)
 
             self.handlers[handler_name] = handler
 
@@ -67,7 +71,9 @@ class Node:
             msg (str): log message.
         """
         # async with self._log_lock:
-        self.logger.write(("LOG: " + msg + "\n").encode())
+        date_time = datetime.datetime.fromtimestamp(time.time()).strftime("%H:%M:%S.%f")
+        log_message = f"{date_time}: {msg}\n".encode()
+        self.logger.write(log_message)
         await self.logger.drain()
 
     async def send(self, dest: str, body: Body):
