@@ -4,7 +4,7 @@ from typing import NotRequired, TypedDict
 class Body(TypedDict):
     type: str
     """
-    A string identifying the type of message this is
+    A string identifying the type of message.
     """
 
     msg_id: NotRequired[int]
