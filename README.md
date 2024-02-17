@@ -1,5 +1,7 @@
 # Maelstrom Python Implementation
 
+This repository is an attempt at an asynchronous implementation of a [Maelstrom](https://github.com/jepsen-io/maelstrom) node in Python. While there are existing [Python](https://github.com/jepsen-io/maelstrom/tree/main/demo/python) implementations, this project distinguishes itself through true asynchronous communication with stdin/stdout/stderr. Additionally, it represents my endeavor to work through all chapters of the Maelstrom documentation.
+
 ## Installation
 
 To begin, you must first install Maelstrom.
