@@ -112,12 +112,18 @@ async def main():
 
                 body = message.get("body", {})
                 typ = body.get("type")
+                in_reply_to = body.get("in_reply_to")
 
-                if typ is None:
+                if in_reply_to:
+                    handler = node.callbacks[in_reply_to]
+                    del node.callbacks[in_reply_to]
+                elif typ:
+                    handler = node.handlers[typ]
+                else:
                     await node.log("Invalid message format")
                     continue
 
-                tg.create_task(node.handlers[typ](node, message))
+                tg.create_task(handler(node, message))
     except asyncio.CancelledError:
         ...
 

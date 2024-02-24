@@ -16,6 +16,7 @@ class Node:
     def __init__(self):
         self.node_ids: set[str] = set()
         self.handlers: dict[str, Handler] = {}
+        self.callbacks: dict[int, Handler] = {}
         self.node_id: str = ""
         self.next_msg_id = 0
 
@@ -42,6 +43,15 @@ class Node:
                 logger.error("Already registered handler for %s", handler_name)
 
             self.handlers[handler_name] = handler
+
+        return inner
+
+    def rpc(self, dest: str, body: Body):
+        async def inner(handler: Handler):
+            self.next_msg_id += 1
+            msg_id = self.next_msg_id
+            self.callbacks[msg_id] = handler
+            await self.send(dest, {**body, "msg_id": msg_id})
 
         return inner
 
