@@ -38,4 +38,4 @@ test-broadcast:
 	${MAELSTROM_BIN_PATH}/maelstrom test -w broadcast --bin $(shell which mnode) --time-limit 20 --rate 100 --node-count 25 --topology grid --latency 100
 
 test-broadcast-2:
-	${MAELSTROM_BIN_PATH}/maelstrom test -w broadcast --bin $(shell which mnode) --time-limit 20 --topology total --nemesis partition
+	${MAELSTROM_BIN_PATH}/maelstrom test -w broadcast --bin $(shell which mnode) --time-limit 20 --topology tree4 --nemesis partition
