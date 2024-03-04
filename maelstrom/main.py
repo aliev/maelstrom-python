@@ -21,6 +21,14 @@ node = Node()
 b = Broadcast(node=node)
 
 
+def create_callback(unacked: list[str], dest: str):
+    async def handler(node: Node, res: Message):
+        if res["body"]["type"] == "broadcast_ok":
+            unacked.remove(dest)
+
+    return handler
+
+
 @node.on()
 async def init(node: Node, msg: Message):
     body = msg.get("body", {})
@@ -91,12 +99,11 @@ async def broadcast(node: Node, msg: Message):
         while unacked:
             await node.log(f"Need to replicate {m} to {unacked}")
 
-            for dest in unacked.copy():
-
-                @node.rpc(dest, {"type": "broadcast", "message": m})
-                async def h(n: Node, res: Message):
-                    if res["body"]["type"] == "broadcast_ok":
-                        unacked.remove(dest)
+            for dest in unacked:
+                node.next_msg_id += 1
+                msg_id = node.next_msg_id
+                node.callbacks[msg_id] = create_callback(unacked, dest)
+                await node.send(dest, {**body, "msg_id": msg_id})
 
             await asyncio.sleep(1)
 
