@@ -80,7 +80,12 @@ async def broadcast(node: Node, msg: Message):
     await node.reply(msg, {"type": "broadcast_ok"})
 
     # Do we need to process this message?
-    body = msg.get("body", {})
+    body = msg.get("body")
+
+    if body is None:
+        await node.log("Mailformed message. body cannot be empty.")
+        return
+
     m = body.get("message")
 
     if m is None:
@@ -94,16 +99,16 @@ async def broadcast(node: Node, msg: Message):
 
     if new_message:
         unacked = b.neighbors.copy()
-        # unacked.remove(msg["src"])
 
         while unacked:
             await node.log(f"Need to replicate {m} to {unacked}")
 
             for dest in unacked:
-                node.next_msg_id += 1
-                msg_id = node.next_msg_id
-                node.callbacks[msg_id] = create_callback(unacked, dest)
-                await node.send(dest, {**body, "msg_id": msg_id})
+                await node.rpc(
+                    dest=dest,
+                    body=body,
+                    handler=create_callback(unacked=unacked, dest=dest),
+                )
 
             await asyncio.sleep(1)
 
