@@ -46,14 +46,18 @@ class Node:
 
         return inner
 
-    def rpc(self, dest: str, body: Body):
-        async def inner(handler: Handler):
-            self.next_msg_id += 1
-            msg_id = self.next_msg_id
-            self.callbacks[msg_id] = handler
-            await self.send(dest, {**body, "msg_id": msg_id})
+    async def rpc(
+        self,
+        dest: str,
+        body: Body,
+        handler: Handler,
+    ):
+        self.next_msg_id += 1
+        msg_id = self.next_msg_id
 
-        return inner
+        self.callbacks[msg_id] = handler
+
+        await self.send(dest, {**body, "msg_id": msg_id})
 
     async def reply(self, req: Message, body: Body):
         """Reply with body to incoming message

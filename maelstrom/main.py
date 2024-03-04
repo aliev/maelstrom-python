@@ -21,6 +21,14 @@ node = Node()
 b = Broadcast(node=node)
 
 
+def create_callback(unacked: list[str], dest: str):
+    async def handler(node: Node, res: Message):
+        if res["body"]["type"] == "broadcast_ok":
+            unacked.remove(dest)
+
+    return handler
+
+
 @node.on()
 async def init(node: Node, msg: Message):
     body = msg.get("body", {})
@@ -67,26 +75,42 @@ async def read(node: Node, msg: Message):
 @node.on()
 async def broadcast(node: Node, msg: Message):
     """A broadcast request sends a message into the network."""
-    body = msg.get("body", {})
-    message = body.get("message")
-    msg_id = body.get("msg_id")
 
-    # We should avoid broadcasting a message if we already have it
-    if message is not None and message not in b.messages:
+    # Acknowledge the request
+    await node.reply(msg, {"type": "broadcast_ok"})
 
-        # Whenever we receive a broadcast message, we'll add that message's message to the set.
-        b.messages.add(message)
+    # Do we need to process this message?
+    body = msg.get("body")
 
-        # Gossip this message to neighbors
-        for neighbor in b.neighbors:
-            # Do not broadcast a message back to the server which sent it to us.
-            if msg["src"] == neighbor:
-                continue
-            await node.send(neighbor, {"type": "broadcast", "message": message})
+    if body is None:
+        await node.log("Mailformed message. body cannot be empty.")
+        return
 
-    # Inter-server messages don't have a msg_id, and don't need a response
-    if msg_id is not None:
-        await node.reply(msg, {"type": "broadcast_ok"})
+    m = body.get("message")
+
+    if m is None:
+        return
+
+    new_message = False
+
+    if m not in b.messages:
+        b.messages.add(m)
+        new_message = True
+
+    if new_message:
+        unacked = b.neighbors.copy()
+
+        while unacked:
+            await node.log(f"Need to replicate {m} to {unacked}")
+
+            for dest in unacked:
+                await node.rpc(
+                    dest=dest,
+                    body=body,
+                    handler=create_callback(unacked=unacked, dest=dest),
+                )
+
+            await asyncio.sleep(1)
 
 
 async def main():
