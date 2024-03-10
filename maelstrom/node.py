@@ -78,7 +78,7 @@ class Node:
 
         await self.send(req["src"], body)
 
-    async def log(self, msg: str) -> None:
+    async def log(self, msg: str, *args) -> None:
         """Thread safe and async version of log.
 
         Args:
@@ -86,8 +86,8 @@ class Node:
         """
         # async with self._log_lock:
         date_time = datetime.datetime.fromtimestamp(time.time()).strftime("%H:%M:%S.%f")
-        log_message = f"{date_time}: {msg}\n".encode()
-        self.logger.write(log_message)
+        log_message = f"{date_time}: {msg}\n" % args
+        self.logger.write(log_message.encode())
         await self.logger.drain()
 
     async def send(self, dest: str, body: Body):
@@ -106,4 +106,4 @@ class Node:
         # async with self._lock:
         self.writer.write((result + "\n").encode())
         await self.writer.drain()
-        await self.log(f"Respond with message {result}")
+        await self.log("Respond with message '%s'", result)

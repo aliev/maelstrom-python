@@ -41,17 +41,17 @@ async def init(node: Node, msg: Message):
     node.node_id = node_id
     node.node_ids.update(node_ids)
 
-    await node.log(f"Initialized node '{node.node_id}'")
+    await node.log("Initialized node '%s'", node.node_id)
 
     await node.reply(msg, {"type": "init_ok"})
-    await node.log(f"Node {node.node_id} initialized.")
+    await node.log("Node %s initialized.", node.node_id)
 
 
 @node.on()
 async def echo(node: Node, msg: Message):
     body = msg.get("body", {})
     node_id = body.get("node_id")
-    await node.log(f"Echoing '{node_id}'")
+    await node.log("Echoing '%s'", node_id)
     await node.reply(msg, {"type": "echo_ok", "echo": body.get("echo", "")})
 
 
@@ -101,7 +101,7 @@ async def broadcast(node: Node, msg: Message):
         unacked = b.neighbors.copy()
 
         while unacked:
-            await node.log(f"Need to replicate {m} to {unacked}")
+            await node.log("Need to replicate %d to %s", m, unacked)
 
             for dest in unacked:
                 await node.rpc(
@@ -132,7 +132,7 @@ async def main():
                     await node.log(str(exc))
                     continue
 
-                await node.log(f"Replying to message {message}")
+                await node.log("Replying to message '%s'", message)
 
                 body = message.get("body", {})
                 typ = body.get("type")
