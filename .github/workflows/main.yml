@@ -23,6 +23,8 @@ jobs:
       with:
         distribution: 'temurin' # See 'Supported distributions' for available options
         java-version: '21'
+    - name: Install Gnuplot
+      run: sudo apt-get update && sudo apt-get install -y gnuplot
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -31,19 +33,19 @@ jobs:
       run: |
         wget https://github.com/jepsen-io/maelstrom/releases/download/v0.2.3/maelstrom.tar.bz2
         mkdir maelstrom-java
-        tar -xvf maelstrom.tar.bz2 -C maelstrom-java
-        chmod a+rx maelstrom-java/maelstrom
-        echo "MAELSTROM_BIN_PATH=$(realpath maelstrom-java)" > .env
+        tar -xvf maelstrom.tar.bz2 -C .
+        chmod -R a+rx maelstrom
+        echo "MAELSTROM_BIN_PATH=$(realpath maelstrom)" > .env
         make dev-install
     - name: Run lint
       run: |
         pre-commit run --all-files
     - name: Test echo
       run: |
-        sudo make test-echo
+        make test-echo
     - name: Test broadcast
       run: |
-        sudo make test-broadcast
+        make test-broadcast
     - name: Test performance
       run: |
-        sudo make test-performance
+        make test-performance
