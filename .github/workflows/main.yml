@@ -30,16 +30,14 @@ jobs:
     - name: Install dependencies
       run: |
         wget https://github.com/jepsen-io/maelstrom/releases/download/v0.2.3/maelstrom.tar.bz2
-        tar -tf maelstrom.tar.bz2
-        echo "MAELSTROM_BIN_PATH=$(realpath maelstrom)" > .env
-        ls -la maelstrom
+        tar -xvf maelstrom.tar.bz2 -C maelstrom-java
+        echo "MAELSTROM_BIN_PATH=$(realpath maelstrom-java)" > .env
         make dev-install
     - name: Run lint
       run: |
         pre-commit run --all-files
     - name: Test echo
       run: |
-        ls -la maelstrom
         make test-echo
     - name: Test broadcast
       run: |
