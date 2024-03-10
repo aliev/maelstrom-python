@@ -40,10 +40,10 @@ jobs:
         pre-commit run --all-files
     - name: Test echo
       run: |
-        make test-echo
+        sudo make test-echo
     - name: Test broadcast
       run: |
-        make test-broadcast
+        sudo make test-broadcast
     - name: Test performance
       run: |
-        make test-performance
+        sudo make test-performance
