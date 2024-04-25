@@ -2,13 +2,15 @@ import asyncio
 import json
 import logging
 import sys
+from ast import Call
+from typing import Callable
 
 from aioshutdown import SIGHUP, SIGINT, SIGTERM
 
 from maelstrom.broadcast import Broadcast
 from maelstrom.node import Node
 from maelstrom.protocol import Message
-from maelstrom.utils import open_io_stream
+from maelstrom.utils import open_io_stream_reader, open_io_stream_writer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,7 +26,8 @@ b = Broadcast(node=node)
 def create_callback(unacked: list[str], dest: str):
     async def handler(node: Node, res: Message):
         if res["body"]["type"] == "broadcast_ok":
-            unacked.remove(dest)
+            if dest in unacked:
+                unacked.remove(dest)
 
     return handler
 
@@ -113,41 +116,46 @@ async def broadcast(node: Node, msg: Message):
             await asyncio.sleep(1)
 
 
+async def loop(
+    reader: asyncio.StreamReader,
+    writer: asyncio.StreamWriter,
+    logger: asyncio.StreamWriter,
+):
+    node.set_io(reader, writer, logger)
+
+    async with asyncio.TaskGroup() as tg:
+        async for line in reader:
+            try:
+                message: Message = json.loads(line)
+            except json.decoder.JSONDecodeError as exc:
+                await node.log(str(exc))
+                continue
+
+            await node.log("Replying to message '%s'", message)
+
+            body = message.get("body", {})
+            typ = body.get("type")
+            in_reply_to = body.get("in_reply_to")
+
+            if in_reply_to:
+                handler = node.callbacks[in_reply_to]
+                del node.callbacks[in_reply_to]
+            elif typ:
+                handler = node.handlers[typ]
+            else:
+                await node.log("Invalid message format")
+                continue
+
+            tg.create_task(handler(node, message))
+
+
 async def main():
     try:
-        reader_stdin, writer_stdout = await open_io_stream(
-            [sys.stdin], [sys.stdout, sys.stderr]
-        )
+        reader = await open_io_stream_reader(sys.stdin)
+        writer = await open_io_stream_writer(sys.stdout)
+        logger = await open_io_stream_writer(sys.stderr)
 
-        reader, *_ = reader_stdin
-        writer, writer_stderr, *_ = writer_stdout
-
-        node.set_io(reader, writer, writer_stderr)
-
-        async with asyncio.TaskGroup() as tg:
-            async for line in reader:
-                try:
-                    message: Message = json.loads(line)
-                except json.decoder.JSONDecodeError as exc:
-                    await node.log(str(exc))
-                    continue
-
-                await node.log("Replying to message '%s'", message)
-
-                body = message.get("body", {})
-                typ = body.get("type")
-                in_reply_to = body.get("in_reply_to")
-
-                if in_reply_to:
-                    handler = node.callbacks[in_reply_to]
-                    del node.callbacks[in_reply_to]
-                elif typ:
-                    handler = node.handlers[typ]
-                else:
-                    await node.log("Invalid message format")
-                    continue
-
-                tg.create_task(handler(node, message))
+        await loop(reader, writer, logger)
     except asyncio.CancelledError:
         ...
 
