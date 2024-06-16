@@ -25,13 +25,13 @@ class Node:
 
     def set_io(
         self,
-        reader: asyncio.StreamReader,
-        writer: asyncio.StreamWriter,
-        logger: asyncio.StreamWriter,
+        request: asyncio.StreamReader,
+        response: asyncio.StreamWriter,
+        stderr: asyncio.StreamWriter,
     ):
-        self.reader = reader
-        self.writer = writer
-        self.logger = logger
+        self.request = request
+        self.response = response
+        self.stderr = stderr
 
     def on(self, name: str | None = None):
         """Registers new handler for node."""
@@ -52,6 +52,10 @@ class Node:
         body: Body,
         handler: Handler,
     ):
+        """
+        Send an async RPC request.
+        Invokes handler with response message once one arrives.
+        """
         self.next_msg_id += 1
         msg_id = self.next_msg_id
 
@@ -87,8 +91,8 @@ class Node:
         # async with self._log_lock:
         date_time = datetime.datetime.fromtimestamp(time.time()).strftime("%H:%M:%S.%f")
         log_message = f"{date_time}: {msg}\n" % args
-        self.logger.write(log_message.encode())
-        await self.logger.drain()
+        self.stderr.write(log_message.encode())
+        await self.stderr.drain()
 
     async def send(self, dest: str, body: Body):
         message: Message = {
@@ -104,6 +108,6 @@ class Node:
             return None
 
         # async with self._lock:
-        self.writer.write((result + "\n").encode())
-        await self.writer.drain()
+        self.response.write((result + "\n").encode())
+        await self.response.drain()
         await self.log("Respond with message '%s'", result)
