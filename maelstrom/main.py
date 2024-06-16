@@ -2,8 +2,6 @@ import asyncio
 import json
 import logging
 import sys
-from ast import Call
-from typing import Callable
 
 from aioshutdown import SIGHUP, SIGINT, SIGTERM
 
@@ -23,10 +21,11 @@ node = Node()
 b = Broadcast(node=node)
 
 
-def create_callback(unacked: list[str], dest: str):
+def create_handler(unacked: list[str], dest: str):
     async def handler(node: Node, res: Message):
         if res["body"]["type"] == "broadcast_ok":
             if dest in unacked:
+                # Good, they've got the message!
                 unacked.remove(dest)
 
     return handler
@@ -101,8 +100,14 @@ async def broadcast(node: Node, msg: Message):
         new_message = True
 
     if new_message:
+        # Gossip this message to neighbors
         unacked = b.neighbors.copy()
 
+        # Except the one who sent it to us; they obviously have the message!
+        if msg["src"] in unacked:
+            unacked.remove(msg["src"])
+
+        # Keep trying until everyone acks
         while unacked:
             await node.log("Need to replicate %d to %s", m, unacked)
 
@@ -110,9 +115,10 @@ async def broadcast(node: Node, msg: Message):
                 await node.rpc(
                     dest=dest,
                     body=body,
-                    handler=create_callback(unacked=unacked, dest=dest),
+                    handler=create_handler(unacked=unacked, dest=dest),
                 )
 
+            # Wait a bit before we try again
             await asyncio.sleep(1)
 
 
@@ -151,11 +157,11 @@ async def loop(
 
 async def main():
     try:
-        reader = await open_io_stream_reader(sys.stdin)
-        writer = await open_io_stream_writer(sys.stdout)
-        logger = await open_io_stream_writer(sys.stderr)
+        stdin = await open_io_stream_reader(sys.stdin)
+        stdout = await open_io_stream_writer(sys.stdout)
+        stderr = await open_io_stream_writer(sys.stderr)
 
-        await loop(reader, writer, logger)
+        await loop(stdin, stdout, stderr)
     except asyncio.CancelledError:
         ...
 
