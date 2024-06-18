@@ -2,6 +2,7 @@ from setuptools import find_namespace_packages, setup  # type: ignore
 
 requirements = [
     "aioshutdown==0.0.2",
+    "aiostd==0.0.1",
 ]
 
 requirements_dev = [

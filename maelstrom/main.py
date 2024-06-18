@@ -4,11 +4,11 @@ import logging
 import sys
 
 from aioshutdown import SIGHUP, SIGINT, SIGTERM
+from aiostd import open_io_stream_reader, open_io_stream_writer
 
 from maelstrom.broadcast import Broadcast
 from maelstrom.node import Node
 from maelstrom.protocol import Message
-from maelstrom.utils import open_io_stream_reader, open_io_stream_writer
 
 logging.basicConfig(
     level=logging.INFO,
