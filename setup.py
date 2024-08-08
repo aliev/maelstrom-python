@@ -7,6 +7,7 @@ requirements = [
 
 requirements_dev = [
     "pre-commit==3.6.1",
+    "pytest==7.2.2",
 ]
 
 setup(

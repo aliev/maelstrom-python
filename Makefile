@@ -40,3 +40,6 @@ test-broadcast:
 
 test-performance:
 	${MAELSTROM_BIN_PATH}/maelstrom test -w broadcast --bin $(shell which mnode) --time-limit 20 --topology tree4 --nemesis partition
+
+test: ## run pytest
+	pytest
