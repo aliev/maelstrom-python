@@ -64,3 +64,11 @@ To run a Maelstrom node:
 ```bash
 mnode
 ```
+
+## Running Tests
+
+To run all tests using pytest, execute the following command:
+
+```bash
+make test
+```
